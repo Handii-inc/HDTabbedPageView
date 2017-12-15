@@ -1,0 +1,12 @@
+osx_image: xcode9.1
+language: objective-c
+script:
+- pod install --project-directory=Example
+- set -o pipefail && xcodebuild test -enableCodeCoverage YES -workspace Example/HDTabbedPageView.xcworkspace
+  -scheme HDTabbedPageView-Example -sdk iphonesimulator11.1 -destination 'platform=iOS
+  Simulator,name=iPhone 6,OS=11.1' ONLY_ACTIVE_ARCH=NO | xcpretty
+- pod lib lint
+notifications:
+  email: false
+  slack:
+    secure: YOj+/YW1ePFS2l8WrNx3HXD0oWC9nPHJScBsJhyfs5NsA01/+GZrql+G+WD80oVMwWXyhd+Ln1gC15fFxWDAiOwkavCFQr7XLmFNRmdnBh37fWndR1FPyv1DN3zVmxZhg9rppz+O9uKeeyNLG+1wKaSI93x6uzfGvKoQOt9WDVssYitQsxtcG7VpdwtaM3AY43vkQN/ZfVUrmSJAIlH46Jm+pabi498QtBkfIttFP9GMfmDyPUHDb3Pog9nXrmELoYafrtzEH5CcRS0+LF54r2NAe6WmoekofNIqVEzdH4cQb4cdWg/mBqWRTrneMBw48jUJp+Py7sEUC0sHJiNN5JnZzX9F2dzQPxa97JX9pCscs4ZSABs94iE+X6pTaBsfTGCKVVNNaHIHTk0eXMlTtCgeE84KQSSZBR1OnV06SnUs0ZH5IgPDzYsZMpnE8bewEORH2xcVDBmRy8Y67LQiuNpQc7njuB0KupIWuprRWhPRPTjWhZZmIrUyuAyTBBXOPlG/zPk06waf+xNuA+oVO9B2qoPykxOSlHGJ0kaC7X0QayXLZlndudXBLotk9ZkX1wMLBMt5zZmRAZjur64nTrW4UBhauRMH/AXiWxTSHp1H69CfSO+tHrqdY+TnFm+CSPq5uk86L4B8X9x3mwuPJS5lKNIV1os3t2NRC3HtZdY=
