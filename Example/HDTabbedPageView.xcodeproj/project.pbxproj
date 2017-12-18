@@ -13,6 +13,7 @@
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
+		6386BEC9EFF2A6FDC901755B /* Pods_HDTabbedPageView_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7033260C1FE393EA00B40B18 /* Pods_HDTabbedPageView_Example.framework */; };
 		703326091FE393EA00B40B18 /* Pods_HDTabbedPageView_Example_HDTabbedPageView_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7033260B1FE393EA00B40B18 /* Pods_HDTabbedPageView_Example_HDTabbedPageView_Tests.framework */; };
 /* End PBXBuildFile section */
 
@@ -55,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6386BEC9EFF2A6FDC901755B /* Pods_HDTabbedPageView_Example.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

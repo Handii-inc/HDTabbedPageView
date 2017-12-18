@@ -1,24 +1,52 @@
-//
-//  ViewController.swift
-//  HDTabbedPageView
-//
-//  Created by IgnorantCoder on 12/15/2017.
-//  Copyright (c) 2017 IgnorantCoder. All rights reserved.
-//
-
 import UIKit
+import HDTabbedPageView
 
-class ViewController: UIViewController {
-
+class ViewController: HDTabbedPageViewController, HDTabbedPageViewControllerDataSource, HDTabbedPageViewControllerStyle {
+    //MARK:- Sub components.
+    private let roundedRect = RoundedRect(color: .orange, padding: 5)
+    
+    //MARK:- Life cycle events.
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+
+        self.view.backgroundColor = .white
+
+        self.dataSource = self
+        self.style = self
+        self.indicator = self.roundedRect
+    }
+    
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        self.view.frame = UIScreen.main.bounds
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    //MARK:- HDTabbedPageViewControllerDataSource
+    var controllers: [UIViewController] = [
+        ViewController.createSampleViewController("Red", .red),
+        ViewController.createSampleViewController("Cyan", .cyan),
+        ViewController.createSampleViewController("Green", .green),
+    ]
+    
+    //MARK:- HDTabbedPageViewControllerStyle
+    var textColorOfTab: UIColor {
+        get {
+            return .black
+        }
     }
-
+    
+    var topGapOfTab: CGFloat {
+        get {
+            return UIApplication.shared.statusBarFrame.height
+        }
+    }
+    
+    private static func createSampleViewController(_ title: String,
+                                                   _ color: UIColor) -> UIViewController
+    {
+        let controller = UIViewController()
+        controller.title = title
+        controller.view.backgroundColor = color
+        return controller
+    }
 }
-
