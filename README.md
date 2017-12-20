@@ -4,6 +4,7 @@
 [![Version](https://img.shields.io/cocoapods/v/HDTabbedPageView.svg?style=flat)](http://cocoapods.org/pods/HDTabbedPageView)
 [![License](https://img.shields.io/cocoapods/l/HDTabbedPageView.svg?style=flat)](http://cocoapods.org/pods/HDTabbedPageView)
 [![Platform](https://img.shields.io/cocoapods/p/HDTabbedPageView.svg?style=flat)](http://cocoapods.org/pods/HDTabbedPageView)
+[![codebeat badge](https://codebeat.co/badges/74eeaebf-49a4-425c-96bf-13b10008c161)](https://codebeat.co/projects/github-com-handii-inc-hdtabbedpageview-master)
 
 ## Description
 Inspired by [TabPageViewController](https://github.com/EndouMari/TabPageViewController).

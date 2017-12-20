@@ -58,10 +58,25 @@ open class HDTabbedPageViewController: UIViewController, UIPageViewControllerDat
     
     open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        guard let dataSourceNotNil = self.dataSource else {
+            return
+        }
 
-        self.initializeIndicator()
-        self.initializeSegementedControl()
-        self.initializeContents()
+        guard let indicatorNotNil = self.indicator else {
+            return
+        }
+        
+        let segmented = (self.segmentedView, self.segmentedControl)
+        
+        Initializer.initialize(indicator: indicatorNotNil,
+                               on: segmented,
+                               by: dataSourceNotNil)
+        Initializer.initialize(segmented: segmented,
+                               with: self.style,
+                               by: dataSourceNotNil)
+        Initializer.initialize(pageViewController: self.pageViewController,
+                               by: dataSourceNotNil)
     }
     
     open override func viewWillLayoutSubviews() {
@@ -143,71 +158,70 @@ open class HDTabbedPageViewController: UIViewController, UIPageViewControllerDat
     }
     
     //MARK:- Privates
-    /**
-     Initialize indicator area.
-     - Note: Call by viewWillAppear
-     */
-    private func initializeIndicator()
-    {
-        guard let indicatorNotNil = self.indicator else {
+    private class Initializer {
+        /**
+         Initialize indicator area.
+            - Note: Call by viewWillAppear
+         */
+        static func initialize(indicator: HDTabbedPageViewIndicator,
+                               on segmented: (UIView, UISegmentedControl),
+                               by dataSource: HDTabbedPageViewControllerDataSource)
+        {
+            let (area, control) = segmented
+            indicator.setCount(count: dataSource.count)
+            area.insertSubview(indicator.asView(),
+                               belowSubview: control)   //Don't move to viewDidLoad. Indicator object has set after viewDidLoad.
             return
         }
         
-        if let count = self.dataSource?.count {
-            indicatorNotNil.setCount(count: count)
-        }
-        
-        self.segmentedView.insertSubview(indicatorNotNil.asView(),
-                                         belowSubview: self.segmentedControl)   //Don't move to viewDidLoad. Indicator object has set after viewDidLoad.
-        return
-    }
-
-    /**
-     Initialize segmented control area.
-     - Note: Call by viewWillAppear
-     */
-    private func initializeSegementedControl()
-    {
-        guard let data = self.dataSource else {
+        /**
+         Initialize segmented control area.
+         - Note: Call by viewWillAppear
+         */
+        static func initialize(segmented: (UIView, UISegmentedControl),
+                               with style: HDTabbedPageViewControllerStyle?,
+                               by dataSource: HDTabbedPageViewControllerDataSource)
+        {
+            let (_, control) = segmented
+            
+            control.removeAllSegments()
+            (0..<dataSource.count).forEach{ i in
+                let title = dataSource.titles[i]
+                control.insertSegment(withTitle: title, at: i, animated: false)
+            }
+            control.selectedSegmentIndex = 0
+            
+            guard let styleNotNil = style else {
+                return  //do nothing
+            }
+            let attributes: [NSAttributedStringKey : Any] = [
+                NSAttributedStringKey.font: UIFont.systemFont(ofSize: styleNotNil.textSizeOfTab),
+                NSAttributedStringKey.foregroundColor: styleNotNil.textColorOfTab
+            ]
+            control.setTitleTextAttributes(attributes,
+                                           for: .normal)
+            
             return
         }
         
-        self.segmentedControl.removeAllSegments()
-        (0..<data.count).forEach{ i in
-            let title = data.titles[i]
-            self.segmentedControl.insertSegment(withTitle: title, at: i, animated: false)
+        /**
+         Initialize contents area.
+         - Note: Call by viewWillAppear
+         */
+        static func initialize(pageViewController: UIPageViewController,
+                               by dataSource: HDTabbedPageViewControllerDataSource)
+        {
+            guard let firstController = dataSource.controllers.first else {
+                return
+            }
+            pageViewController.setViewControllers([firstController],
+                                                  direction: .forward,
+                                                  animated: false,
+                                                  completion: nil)
+            return
         }
-        self.segmentedControl.selectedSegmentIndex = 0
-        
-        guard let styleNotNil = self.style else {
-            return  //do nothing
-        }
-        let attributes: [NSAttributedStringKey : Any] = [
-            NSAttributedStringKey.font: UIFont.systemFont(ofSize: styleNotNil.textSizeOfTab),
-            NSAttributedStringKey.foregroundColor: styleNotNil.textColorOfTab
-        ]
-        self.segmentedControl.setTitleTextAttributes(attributes,
-                                                     for: .normal)
-        
-        return
     }
     
-    /**
-     Initialize contents area.
-     - Note: Call by viewWillAppear
-     */
-    private func initializeContents()
-    {
-        guard let firstController = self.dataSource?.controllers.first else {
-            return
-        }
-        self.pageViewController.setViewControllers([firstController],
-                                                   direction: .forward,
-                                                   animated: false,
-                                                   completion: nil)
-        return
-    }
-
     private func pageViewController(viewController: UIViewController,
                                     offset: Int) -> UIViewController?
     {
@@ -245,38 +259,35 @@ open class HDTabbedPageViewController: UIViewController, UIPageViewControllerDat
         let idx = sender.selectedSegmentIndex
 
         self.view.isUserInteractionEnabled = false
-        let enableInteraction = { [unowned self] (_ isComplete: Bool) -> Void in
-            if isComplete {
-                self.view.isUserInteractionEnabled = true
-            }
-        }
-        
         self.turnPages(from: currentIdx,
                        to: idx,
-                       controllers: viewModel.controllers,
-                       completion: enableInteraction)
+                       controllers: viewModel.controllers)
         self.indicator?.selected(index: idx) //operate indicator.
         return
     }
     
     private func turnPages(from: Int,
                            to: Int,
-                           controllers: [UIViewController],
-                           completion: @escaping (Bool) -> Void)
+                           controllers: [UIViewController])
     {
         let direction: UIPageViewControllerNavigationDirection = (from < to) ? .forward : .reverse
         let next = (direction == .forward) ? from + 1 : from - 1
         let isEnd = (next == to)
 
+        let completion = { [unowned self] (_: Bool) in
+            if isEnd {
+                self.view.isUserInteractionEnabled = true
+            }
+        }
         self.pageViewController.setViewControllers([controllers[next]],
                                                    direction: direction,
                                                    animated: true,
-                                                   completion: isEnd ? completion : nil)
+                                                   completion: completion)
         if isEnd {
             return
         }
         
-        self.turnPages(from: next, to: to, controllers: controllers, completion: completion)
+        self.turnPages(from: next, to: to, controllers: controllers)
         return
     }
 }
